@@ -1,42 +1,58 @@
 package gie.aarca
 
-import android.app.Activity
+import android.app.{Activity, Application}
 import android.os.Bundle
 import android.util.Log
+import com.badlogic.gdx.ApplicationListener
+import com.badlogic.gdx.backends.android.AndroidApplication
 import org.slf4j
 import slogging._
 
 
-object MainActivity {
-    LoggerConfig.factory = SLF4JLoggerFactory//PrintLoggerFactory
-    LoggerConfig.level = LogLevel.TRACE
+class App extends Application {
+    override def onCreate(): Unit ={
+        super.onCreate()
 
-    def  onCreate(): Unit ={}
+        LoggerConfig.factory = SLF4JLoggerFactory//PrintLoggerFactory
+        LoggerConfig.level = LogLevel.TRACE
+    }
 }
 
-class MainActivity extends Activity with TypedFindView with LazyLogging {
-    lazy val textview = findView(TR.text)
 
-     val ll = slf4j.LoggerFactory.getLogger(classOf[MainActivity])
+class Game extends ApplicationListener {
+    def resize(i: Int, i1: Int): Unit ={
+
+    }
+
+    def dispose(): Unit ={
+
+    }
+
+    def pause(): Unit ={
+
+    }
+
+    def render(): Unit ={
+
+    }
+
+    def resume(): Unit ={
+
+    }
+
+    def create(): Unit ={
+
+    }
+}
+
+
+class MainActivity extends AndroidApplication with TypedFindView with LazyLogging {
+     lazy val textview = findView(TR.text)
 
     /** Called when the activity is first created. */
      override def onCreate(savedInstanceState: Bundle): Unit = {
-        super.onCreate(savedInstanceState)
-         MainActivity.onCreate()
-         setContentView(R.layout.main)
-         textview.setText("Hello world, from aarca!")
-
-        Log.d("tag","debug Log.d()")
-
-        ll.debug("ddddd!!!fff")
-
         logger.debug("1111111111111111111debug message!!!")
-
-        ll.warn("lll ddddd!!!12")
-
-
-        logger.info("INFO!! wow22!")
-        logger.error("TEST!!! wow2")
-        logger.warn("WARN!!!")
+        super.onCreate(savedInstanceState)
+        initialize(new Game());
     }
 }

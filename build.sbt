@@ -31,7 +31,7 @@ showSdkProgress in Android := false
 //)
 
 
-//proguardOptions in Android ++= Seq(
+proguardOptions in Android ++= Seq(
 //    "-dontwarn org.scalatest.**",
 //    "-dontwarn org.mockito.**",
 //    "-dontwarn org.objenesis.**",
@@ -39,9 +39,16 @@ showSdkProgress in Android := false
 //    "-dontnote org.mockito.**",
 //    "-dontnote org.objenesis.**",
 //    "-keep class * extends org.scalatest.FunSuite"
-//)
+    "-keep public class com.badlogic.gdx.** {public *;}",
+    "-dontwarn com.badlogic.gdx.jnigen.**",
+    "-dontwarn android.support.v4.app.**"
+)
 
-//proguardCache in Android ++=
+proguardCache in Android ++=
+        "scala" ::
+        "com.badlogic" ::
+        "android.support" ::
+        "slogging" ::
 //        "org.scaloid" ::
 //        "org.scalatest" ::
 //        "org.scalautils" ::
@@ -51,7 +58,7 @@ showSdkProgress in Android := false
 //        "scala.util.parsing.combinator" ::
 //        "scala.util.parsing.input" ::
 //        "scala.util.parsing.json" ::
-//        Nil
+        Nil
 
 packagingOptions in Android := PackagingOptions(excludes = Seq(
     "META-INF/MANIFEST.MF",
@@ -73,3 +80,24 @@ libraryDependencies ++= {
         "biz.enef" %% "slogging-slf4j" % "0.4.0"
     )
 }
+
+
+//app support
+
+libraryDependencies += "com.android.support" % "support-v4"  % "23.3.0"
+
+//libGDX
+
+
+
+
+//libraryDependencies ++= {
+//    val libgdxVersion = "1.9.3"
+//    Seq(
+//        "com.badlogicgames.gdx" % "gdx-backend-android" % libgdxVersion
+//	"com.badlogicgames.gdx" % "gdx-platform" % libgdxVersion classifier "natives-armeabi",
+//	"com.badlogicgames.gdx" % "gdx-platform" % libgdxVersion classifier "natives-armeabi-v7a",
+//    )
+//}
+
+
