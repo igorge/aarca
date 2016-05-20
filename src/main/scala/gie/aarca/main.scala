@@ -1,7 +1,7 @@
 package gie.aarca
 
 import android.app.{Activity, Application}
-import android.os.Bundle
+import android.os.{Bundle, Debug}
 import android.util.Log
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.backends.android.{AndroidApplication, AndroidApplicationConfiguration}
@@ -24,6 +24,8 @@ class App extends Application with LazyLogging {
 
 
 class MainActivity extends AndroidApplication with TypedFindView with LazyLogging {
+
+    //Debug.waitForDebugger()
 
     override def onCreate(savedInstanceState: Bundle): Unit = {
         logger.trace("MainActivity.onCreate()")

@@ -6,7 +6,7 @@ import scala.concurrent._
 import scala.util.Try
 
 
-package object gdx {
+package object gdx extends ResourcePackageTrait {
 
     def uiFuture[R](f: =>R): Future[R]={
 
