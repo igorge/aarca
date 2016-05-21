@@ -20,7 +20,6 @@ package object gdx extends ResourcePackageTrait {
         promise.future
     }
 
-
 }
 
 

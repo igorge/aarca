@@ -35,6 +35,10 @@ class ResourceHolder[T >: Null <: Disposable ](resource:T) extends Disposable {
     }
 }
 
+trait ResourceContextResolver {
+    implicit def implicitResourceContext: ResourceContext
+}
+
 
 trait ResourceContext extends Disposable { this: StrictLogging =>
 
@@ -67,9 +71,9 @@ trait ResourceContext extends Disposable { this: StrictLogging =>
             val r = gdxResources.remove(tmp)
             assert(r)
             try{ tmp.dispose() } catch {
-                case ex:Throwable => logger.error(s"Exception while freeing GL resources: ${ex}")
+                case ex:Throwable => logger.error(s"Exception while freeing gdx resources: ${ex}")
             }
-            logger.debug("gcTick(): released native gl resource")
+            logger.debug("gcTick(): released gdx resource")
         }
     }
 
@@ -84,7 +88,7 @@ trait ResourceContext extends Disposable { this: StrictLogging =>
             try{ tmp.dispose() } catch {
                 case ex:Throwable => logger.error(s"Exception while freeing GL resources: ${ex}")
             }
-            logger.debug("gcTick(): released native gl resource")
+            logger.debug("gcTick(): released gdx resource")
             tmp = gdxPhantomsQueue.poll().asInstanceOf[ResourceReference[_]]
         }
     }
@@ -94,7 +98,7 @@ trait ResourceContext extends Disposable { this: StrictLogging =>
 
         gdxResources.foreach{ resourceRef=>
             try{ resourceRef.dispose() } catch {
-                case ex:Throwable => logger.error(s"Exception while freeing GL resources: ${ex}")
+                case ex:Throwable => logger.error(s"Exception while freeing gdx resources: ${ex}")
             }
         }
         logger.debug("gcForceClearAll()")
