@@ -1,8 +1,9 @@
 package gie.aarca
 
-import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera, Texture}
+import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, Sprite, SpriteBatch}
 import com.badlogic.gdx.math.{Vector2, Vector3}
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.{ApplicationListener, Gdx}
 import com.badlogic.gdx.physics.box2d._
@@ -25,6 +26,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
     val virtW = 1080*8 //Gdx.graphics.getWidth()
     val virtH = 1794*8 //Gdx.graphics.getHeight()
 
+    lazy val fpsLogger = new FPSLogger()
 
     lazy val camera = new OrthographicCamera()
     lazy val viewport = new FitViewport(virtW,virtH, camera)
@@ -39,8 +41,11 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
     }
 
     object sim {
+
+        val debugRenderer = new Box2DDebugRenderer()
+
         val phyScale = 1f / 216
-        val world = manageDisposableResource (new World(new Vector2(0, -98f), true))
+        val world = manageDisposableResource (new World(new Vector2(0, -50), true))
 
         val body = {
             val bodyDef = new BodyDef()
@@ -56,13 +61,42 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
         private def fixture(body:Body) = {
             val shape = manageResource(new PolygonShape())
-            shape().setAsBox(sprite.width, sprite.height)
+            shape().setAsBox(sprite.width/2, sprite.height/2)
 
             val fixtureDef = new FixtureDef()
             fixtureDef.shape = shape()
             fixtureDef.density = 1f
 
             body.createFixture(fixtureDef)
+        }
+
+
+        val bottomEdge = {
+
+            val bodyDef = new BodyDef {
+                `type` = BodyType.StaticBody
+                position.set(0, -1000f)
+            }
+
+            val b = world().createBody(bodyDef)
+
+
+            val s = manageResource(new PolygonShape(){
+                setAsBox(400*8,50)
+            })
+
+            b.createFixture( new FixtureDef{
+                shape = s()
+                density = 1f
+                restitution = 1f
+            })
+
+
+            logger.debug("box")
+
+            b
+
+
         }
 
 
@@ -99,9 +133,12 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             //sprite.setOriginPosition(pos.x, pos.y)
         }
 
-        sim.world().step(Gdx.graphics.getDeltaTime(), 6, 2)
+        sim.world().step(Gdx.graphics.getDeltaTime(), 8, 3)
 
         val pos = sim.body.getPosition()
+
+
+        //logger.debug(s"${sim.bottomEdge.getPosition}")
 
         sprite.setOPosition(pos)
 
@@ -114,9 +151,16 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
         sprite.draw(batch())
         batch().end()
 
+        Gdx.gl.glLineWidth(5)
+        sim.debugRenderer.render( sim.world(), camera.combined)
+
         drawDebugAxis(viewport)
 
         this.gcTick()
+
+
+        fpsLogger.log()
+
 
     }
 
