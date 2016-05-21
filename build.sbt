@@ -39,7 +39,8 @@ proguardOptions in Android ++= Seq(
 //    "-dontnote org.mockito.**",
 //    "-dontnote org.objenesis.**",
 //    "-keep class * extends org.scalatest.FunSuite"
-    "-keep public class com.badlogic.gdx.** {public *;}",
+    "-keepattributes Signature",
+    "-keep public class com.badlogic.gdx.** {*;}",
     "-dontwarn com.badlogic.gdx.jnigen.**",
     "-dontwarn android.support.v4.app.**"
 )

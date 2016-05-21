@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 
 trait DebugRenderer { this: ResourceContextResolver =>
 
-    private lazy val m_debugRenderer = managedResource (new ShapeRenderer())
+    private lazy val m_debugRenderer = manageDisposableResource (new ShapeRenderer())
 
     def debugRenderer = m_debugRenderer()
 

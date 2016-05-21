@@ -1,24 +1,27 @@
 package gie.gdx
 
+import com.badlogic.gdx.physics.box2d.Shape
 import com.badlogic.gdx.utils.Disposable
 import slogging.StrictLogging
 
 
 
-final class DisposableOnce[T >: Null <:Disposable ](var resource:T) extends Disposable {
-    @inline def apply() = resource
-    @inline def get = resource
+abstract class DisposableOnceAbstract[T >: Null <: AnyRef](var resource:T) extends Disposable {
+    @inline final def apply() = resource
+    @inline final def get = resource
+
+    protected def release():Unit
 
     def dispose(): Unit ={
         if (resource ne null){
-            resource.dispose()
+            release()
             resource = null
         }
     }
+
 }
 
-class ResourceHolder[T >: Null <: Disposable ](resource:T) extends Disposable {
-    private val m_resource = new DisposableOnce[T](resource)
+class ResourceHolder[T >: Null <: AnyRef](private val m_resource:DisposableOnceAbstract[T]) extends Disposable {
     @inline private[gdx] def disposableOnce = m_resource
     @inline def apply():T = m_resource()
 
@@ -27,9 +30,9 @@ class ResourceHolder[T >: Null <: Disposable ](resource:T) extends Disposable {
     }
 }
 
- class ResourceReference[T >: Null <: Disposable ](holder: ResourceHolder[T],
-                                          val value: DisposableOnce[T],
-                                          queue: java.lang.ref.ReferenceQueue[AnyRef]) extends java.lang.ref.PhantomReference[AnyRef](holder, queue) {
+ class ResourceReference[T >: Null <: AnyRef ](holder: ResourceHolder[T],
+                                                   val value: DisposableOnceAbstract[T],
+                                                   queue: java.lang.ref.ReferenceQueue[AnyRef]) extends java.lang.ref.PhantomReference[AnyRef](holder, queue) {
     def dispose(): Unit ={
         value.dispose()
     }
@@ -53,7 +56,7 @@ trait ResourceContext extends Disposable { this: StrictLogging =>
         if(m_homeTread != Thread.currentThread.getId) throw new Exception(s"Not at home, ${m_homeTread} != ${Thread.currentThread.getId}")
     }
 
-    def registerResourceReference[T >: Null <: Disposable ](holder: ResourceHolder[T]):ResourceReference[T] = {
+    def registerResourceReference[T >: Null <:AnyRef](holder: ResourceHolder[T]):ResourceReference[T] = {
         impl_checkHome()
 
         val phantomRef = new ResourceReference[T](holder, holder.disposableOnce, queue)
@@ -106,12 +109,26 @@ trait ResourceContext extends Disposable { this: StrictLogging =>
 }
 
 trait ResourcePackageTrait {
-    def managedResource[T >: Null <: Disposable ](resource: T)(implicit resourceContext:ResourceContext) = {
-        val resourceHolder = new ResourceHolder[T](resource)
+
+    def manageDisposableResource[T >: Null <: Disposable ](resource: T)(implicit resourceContext:ResourceContext) = {
+        val resourceHolder = new ResourceHolder[T](new DisposableOnceAbstract(resource){
+            protected def release(): Unit = resource.dispose()
+        })
 
         resourceContext.registerResourceReference(resourceHolder)
 
         resourceHolder
     }
+
+    def manageResource[T >: Null <: Shape](resource: T)(implicit resourceContext:ResourceContext) = {
+        val resourceHolder = new ResourceHolder[T](new DisposableOnceAbstract(resource){
+            protected def release(): Unit = resource.dispose()
+        })
+
+        resourceContext.registerResourceReference(resourceHolder)
+
+        resourceHolder
+    }
+
 
 }

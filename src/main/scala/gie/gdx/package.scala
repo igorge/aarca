@@ -16,7 +16,6 @@ package object gdx extends ResourcePackageTrait {
             def run(): Unit = promise.complete(Try{f})
         })
 
-
         promise.future
     }
 
