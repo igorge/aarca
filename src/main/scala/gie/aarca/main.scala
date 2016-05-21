@@ -2,10 +2,7 @@ package gie.aarca
 
 import android.app.{Activity, Application}
 import android.os.{Bundle, Debug}
-import android.util.Log
-import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.backends.android.{AndroidApplication, AndroidApplicationConfiguration}
-import org.slf4j
 import slogging._
 
 import scala.concurrent.ExecutionContext.Implicits.global
