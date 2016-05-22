@@ -2,7 +2,7 @@ package gie.gdx
 
 import com.badlogic.gdx.physics.box2d.Shape
 import com.badlogic.gdx.utils.Disposable
-import slogging.StrictLogging
+import slogging.{LoggerHolder, StrictLogging}
 
 
 
@@ -43,7 +43,7 @@ trait ResourceContextResolver {
 }
 
 
-trait ResourceContext extends Disposable { this: StrictLogging =>
+trait ResourceContext extends Disposable { this: LoggerHolder =>
 
     private lazy val m_homeTread = Thread.currentThread.getId
 

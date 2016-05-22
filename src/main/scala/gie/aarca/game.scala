@@ -20,6 +20,10 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
     with StrictLogging
 {
 
+
+    lazy val stageController = new StageController()
+
+
     implicit def implicitResourceContext = this
 
     //fixed 'virtual' field
@@ -106,26 +110,45 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
     def create(): Unit ={
         logger.trace(s"Game.create()")
+
+        stageController.onCreate()
+
         //Gdx.graphics.setContinuousRendering(false)
 //        font().setColor(Color.RED)
     }
 
     def resize(w: Int, h: Int): Unit ={
         logger.trace(s"Game.resize(${w}, ${h})")
+
+        stageController.onSurfaceChanged(w,h)
+
         viewport.update(w, h)
     }
 
     override def dispose(): Unit ={
         logger.trace(s"Game.dispose()")
+
+        stageController.onDestroy()
+
         super.dispose()
     }
 
     def pause(): Unit ={
         logger.trace(s"Game.pause()")
+
+        stageController.onPause()
+        stageController.onSaveState()
     }
 
     def render(): Unit ={
         //logger.trace(s"Game.render()")
+
+        val deltaInSec = Gdx.graphics.getDeltaTime()
+
+        //logger.debug(s"DELTA: ${deltaInSec}")
+
+        stageController.update(deltaInSec)
+        stageController.render(deltaInSec)
 
         if (Gdx.input.isTouched()) {
             //logger.trace("Input occurred at x=" + Gdx.input.getX() + ", y=" + Gdx.input.getY())
@@ -166,6 +189,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
     def resume(): Unit ={
         logger.trace(s"Game.resume()")
+        stageController.onResume()
 
     }
 
