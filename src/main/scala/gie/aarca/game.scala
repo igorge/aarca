@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d._
 import slogging.StrictLogging
 import gie.gdx.{DebugRenderer, ResourceContext, ResourceContextResolver, manageDisposableResource, manageResource}
 import gie.gdx.implicits._
+import gie.gdx.stage.StageWrapper
+import gie.utils.RunOnce
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,7 +23,9 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 {
 
 
-    lazy val stageController = new StageController()
+    lazy val stageController = new StageWrapper(new StageController())
+
+    stageController.implicitResourceContext
 
 
     implicit def implicitResourceContext = this
@@ -112,10 +116,12 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
         logger.trace(s"Game.create()")
 
         stageController.onCreate()
+        stageController.onResume()
 
         //Gdx.graphics.setContinuousRendering(false)
 //        font().setColor(Color.RED)
     }
+
 
     def resize(w: Int, h: Int): Unit ={
         logger.trace(s"Game.resize(${w}, ${h})")
@@ -139,6 +145,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
         stageController.onPause()
         stageController.onSaveState()
     }
+
 
     def render(): Unit ={
         //logger.trace(s"Game.render()")
@@ -177,10 +184,16 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
         Gdx.gl.glLineWidth(5)
         sim.debugRenderer.render( sim.world(), camera.combined)
 
-        drawDebugAxis(viewport)
+        //drawDebugAxis(viewport)
 
         this.gcTick()
 
+
+        val vp = stageController.viewport
+        if(vp ne null) {
+            Gdx.gl.glLineWidth(5)
+            drawDebugAxis(viewport)
+        }
 
         fpsLogger.log()
 
