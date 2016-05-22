@@ -37,6 +37,8 @@ trait StageTrait extends ResourceContextResolver {
     def onPause(): Unit
     def onResume(): Unit
 
+    def renderDebugInfo(): Unit
+
 }
 
 class StageWrapper(stage: StageTrait) extends StageTrait with StrictLogging {
@@ -90,4 +92,10 @@ class StageWrapper(stage: StageTrait) extends StageTrait with StrictLogging {
         stage.onCreate()
 
     }
+
+    def renderDebugInfo(): Unit={
+        //logger.debug(s"StageWrapper(${stage}).renderDebugInfo()")
+        stage.renderDebugInfo()
+    }
+
 }

@@ -17,25 +17,3 @@ class StageController()(implicit implicitParentResourceContext: ResourceContext)
 
 }
 
-
-
-class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageTrait {
-
-    def update(delta: Float): Unit = {}
-
-    def onSurfaceChanged(width: Int, height: Int): Unit ={}
-
-    def onPause(): Unit ={}
-
-    def onSaveState(): Unit ={}
-
-    def viewport: Viewport =null
-
-    def render(delta: Float): Unit ={}
-
-    def onResume(): Unit ={}
-
-    def onDestroy(): Unit ={}
-
-    def onCreate(): Unit ={}
-}

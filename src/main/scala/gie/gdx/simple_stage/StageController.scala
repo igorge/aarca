@@ -96,6 +96,11 @@ abstract class StageController
         imp_ProcessCmd()
     }
 
+
+    def renderDebugInfo(): Unit ={
+        m_currentStage.renderDebugInfo()
+    }
+
     def viewport: Viewport = m_currentStage.viewport
 
     private def imp_ProcessCmd(): Unit ={
@@ -142,4 +147,6 @@ object NullStage extends StageTrait {
     def onSaveState(): Unit = {}
 
     def viewport: Viewport = null
+
+    def renderDebugInfo(): Unit ={}
 }
