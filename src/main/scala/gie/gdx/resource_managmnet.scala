@@ -10,7 +10,11 @@ abstract class DisposableOnceAbstract[T >: Null <: AnyRef](var resource:T) exten
     @inline final def apply() = resource
     @inline final def get = resource
 
+    private val debug_str = s"DisposableOnceAbstract(${resource}) aka ${super.toString}"
+
     protected def release():Unit
+
+    override def toString = debug_str
 
     def dispose(): Unit ={
         if (resource ne null){
@@ -25,6 +29,8 @@ class ResourceHolder[T >: Null <: AnyRef](private val m_resource:DisposableOnceA
     @inline private[gdx] def disposableOnce = m_resource
     @inline def apply():T = m_resource()
 
+    override def toString = s"ResourceHolder(${m_resource.toString}) aka ${super.toString}"
+
     def dispose(): Unit ={
         m_resource.dispose()
     }
@@ -33,6 +39,12 @@ class ResourceHolder[T >: Null <: AnyRef](private val m_resource:DisposableOnceA
  class ResourceReference[T >: Null <: AnyRef ](holder: ResourceHolder[T],
                                                    val value: DisposableOnceAbstract[T],
                                                    queue: java.lang.ref.ReferenceQueue[AnyRef]) extends java.lang.ref.PhantomReference[AnyRef](holder, queue) {
+
+     private val debug_str = s"ResourceReference(${value.toString}) aka java.lang.ref.PhantomReference aka ${super.toString}"
+
+     override def toString = debug_str
+
+
     def dispose(): Unit ={
         value.dispose()
     }
@@ -76,7 +88,7 @@ trait ResourceContext extends Disposable { this: LoggerHolder =>
             try{ tmp.dispose() } catch {
                 case ex:Throwable => logger.error(s"Exception while freeing gdx resources: ${ex}")
             }
-            logger.debug("gcTick(): released gdx resource")
+            logger.debug(s"gcTick(): released gdx resource: ${tmp}")
         }
     }
 

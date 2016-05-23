@@ -10,10 +10,18 @@ import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import gie.gdx.{ResourceContext, manageDisposableResource, manageResource}
 import gie.gdx.stage.{StageControllerApiTrait, StageTrait}
 import gie.gdx.implicits._
-import slogging.StrictLogging
+import slogging.{Logger, LoggerHolder, StrictLogging}
+
+import scala.collection.mutable
 
 
-class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageTrait with StrictLogging {
+class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageTrait with StrictLogging { asThis =>
+
+    private val cmdQueue = new mutable.Queue[()=>Unit]()
+    private def applyCmdQueue(): Unit ={
+        cmdQueue.foreach(_.apply())
+        cmdQueue.clear()
+    }
 
     private val w = 20  //blocks
     private val h = (w*1.66f).toInt
@@ -30,71 +38,32 @@ class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageT
 
     private val world = manageDisposableResource (new World(new Vector2(0, 0), true))
 
-    private object contacter extends ContactListener {
-        def postSolve(contact: Contact, impulse: ContactImpulse): Unit ={
-            val a = contact.getFixtureA.getBody.getUserData()
-            val b = contact.getFixtureB.getBody.getUserData()
-
-            logger.debug(s"contact postSolve: ${a}  <=>  ${b}")
-        }
-
-        def endContact(contact: Contact): Unit ={
-            val a = contact.getFixtureA.getBody.getUserData()
-            val b = contact.getFixtureB.getBody.getUserData()
-
-            logger.debug(s"contact end: ${a}  <=>  ${b}")
-        }
-
-        def beginContact(contact: Contact): Unit ={
-            val a = contact.getFixtureA.getBody.getUserData()
-            val b = contact.getFixtureB.getBody.getUserData()
-
-            logger.debug(s"contact begin: ${a}  <=>  ${b}")
-        }
-
-        def preSolve(contact: Contact, oldManifold: Manifold): Unit ={
-            val a = contact.getFixtureA.getBody.getUserData()
-            val b = contact.getFixtureB.getBody.getUserData()
-
-            logger.debug(s"contact preSolve: ${a}  <=>  ${b}")
-        }
+    private object contacter extends ContactResolverTrait with LoggerHolder {
+        val stage = asThis
+        protected def logger: Logger = asThis.logger
     }
+
     world().setContactListener(contacter)
 
     private implicit def implicitBoxWorld = world()
 
-    private val bricks = for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)
+    private val bricks = (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).to[mutable.Set]
     private val ball = new GameObjectBall(ballTex(), 0,0)
 
     buildWorldWalls()
 
 
 
-    private def buildWall(x: Float, y: Float, w: Float, h: Float): Unit ={
-        val body = world().createBody(new BodyDef {
-            `type` = BodyType.StaticBody
-            position.set(x, y)
-        })
-
-        val goShape = manageResource(new PolygonShape(){
-            setAsBox(w/2, h/2)
-        })
-
-        val fixture0 = body.createFixture( new FixtureDef{
-            shape = goShape()
-            density = 1f
-            restitution = 1f
-            friction = 0f
-
-        })
-
+    private def buildWall(x: Float, y: Float, w: Float, h: Float):GameObjectWall ={
+        new GameObjectWall(x, y, w, h)
     }
+
     private def buildWorldWalls(): Unit ={
         //bottom
         buildWall(0, -h/2-1, w, 1)
 
         //top
-        buildWall(0, h/2+1, w, 1)
+        buildWall(0, h/2, w, 1)
 
         //left
         buildWall(-w/2-0.5f, 0, 1, h)
@@ -103,10 +72,12 @@ class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageT
         buildWall(w/2+0.5f, 0, 1, h)
     }
 
-
     def update(delta: Float): Unit = {
 
+
         world().step(delta, 8, 3)
+
+        applyCmdQueue()
 
         bricks.foreach{go=>
             go.update()
@@ -149,4 +120,18 @@ class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageT
     def onDestroy(): Unit ={}
 
     def onCreate(): Unit ={}
+
+
+
+    def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
+        logger.debug("HIT")
+
+        cmdQueue += (()=>{
+            val isRemoved=bricks.remove(brick)
+            assert (isRemoved)
+
+            world().destroyBody(brick.body)
+
+        })
+    }
 }

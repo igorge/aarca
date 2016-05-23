@@ -1,8 +1,9 @@
 package gie.aarca
 
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d._
 import gie.gdx.implicits._
+
 
 trait GameObjectTrait {
     def sprite: Sprite
@@ -25,8 +26,8 @@ trait GameObjectTrait {
         }
     }
 
-
     protected def init(): Unit ={
         body.setUserData(this)
     }
+
 }

@@ -162,29 +162,6 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             //sprite.setOriginPosition(pos.x, pos.y)
         }
 
-//        sim.world().step(Gdx.graphics.getDeltaTime(), 8, 3)
-//
-//        val pos = sim.body.getPosition()
-
-
-        //logger.debug(s"${sim.bottomEdge.getPosition}")
-
-//        sprite.setOPosition(pos)
-
-//        Gdx.gl.glClearColor(1, 1, 1, 1)
-//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-//
-//        batch().setProjectionMatrix(camera.combined)
-//        batch().begin()
-//        //font.draw(batch, "Hello World", 200, 200)
-//        sprite.draw(batch())
-//        batch().end()
-//
-//        Gdx.gl.glLineWidth(5)
-//        sim.debugRenderer.render( sim.world(), camera.combined)
-
-        //drawDebugAxis(viewport)
-
         this.gcTick()
 
 
@@ -198,7 +175,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             drawDebugAxis(viewport)
         }
 
-        fpsLogger.log()
+//        fpsLogger.log()
 
 
     }

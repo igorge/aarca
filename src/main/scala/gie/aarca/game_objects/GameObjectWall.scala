@@ -7,23 +7,17 @@ import com.badlogic.gdx.physics.box2d._
 import gie.gdx.{ResourceContext, manageDisposableResource, manageResource}
 import gie.gdx.implicits._
 
-class GameObjectBrick(texture: Texture,posX: Float, posY: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectTrait { go=>
+class GameObjectWall(posX: Float, posY: Float, override val width: Float , override val height: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectTrait { go=>
 
-    private val m_sprite = {
-        val s = new Sprite(texture)
-        s.setSize(2-0.1f,1-0.1f)
-        s.setOriginCenter()
-        s.setOPosition(posX, posY)
-        s
-    }
+    override def x = m_body.getPosition.x
+    override def y = m_body.getPosition.y
 
     private val m_body = world.createBody(new BodyDef {
         `type` = BodyType.StaticBody
-        position.set(go.x, go.y)
+        position.set(posX, posY)
     })
 
     private val goShape = manageResource(new PolygonShape(){
-        override def toString = "GameObjectBrick.PolygonShape()"
         setAsBox(go.width/2, go.height/2)
     })
 
@@ -34,7 +28,7 @@ class GameObjectBrick(texture: Texture,posX: Float, posY: Float)(implicit world:
         friction = 0f
     })
 
-    def sprite: Sprite = m_sprite
+    def sprite: Sprite = null
     def body: Body = m_body
 
     init()
