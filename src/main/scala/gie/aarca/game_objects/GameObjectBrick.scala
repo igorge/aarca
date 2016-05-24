@@ -35,7 +35,7 @@ class GameObjectBrick(texture: Texture,posX: Float, posY: Float)(implicit world:
     })
 
     def sprite: Sprite = m_sprite
-    def body: Body = m_body
+    protected def body: Body = m_body
 
     init()
 

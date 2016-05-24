@@ -36,8 +36,8 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
     lazy val fpsLogger = new FPSLogger()
 
-    lazy val camera = new OrthographicCamera()
-    lazy val viewport = new FitViewport(virtW,virtH, camera)
+//    lazy val camera = new OrthographicCamera()
+//    lazy val viewport = new FitViewport(virtW,virtH, camera)
 
     //lazy val batch = manageDisposableResource (new SpriteBatch())
 //    lazy val font = managedResource (new BitmapFont())
@@ -127,7 +127,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
         stageController.onSurfaceChanged(w,h)
 
-        viewport.update(w, h)
+        //viewport.update(w, h)
     }
 
     override def dispose(): Unit ={
@@ -172,7 +172,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             stageController.renderDebugInfo()
 
             Gdx.gl.glLineWidth(5)
-            drawDebugAxis(viewport)
+            drawDebugAxis(vp)
         }
 
 //        fpsLogger.log()

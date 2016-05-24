@@ -15,7 +15,8 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
 
         enqueueAfterWorldCmd{()=>
             removeRenderable(brick)
-            implicitly[World].destroyBody(brick.body)
+            //implicitly[World].destroyBody(brick.body)
+            brick.destroy()
         }
     }
 

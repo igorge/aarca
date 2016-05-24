@@ -6,10 +6,23 @@ import gie.gdx.{ResourceContext, manageDisposableResource, manageResource}
 
 import scala.collection.mutable
 
+
+trait UpdatableWorldTrait {
+    def updateWorld(): Unit
+}
+
+
+object CollisionCategories {
+    val batDynamic: Short = 2
+    val batStatic: Short = 4
+}
+
+
 trait GameWorldWorldTrait { this: ArcanoidStage =>
 
     protected val w = 20  //blocks
     protected val h = (w*1.66f).toInt
+
 
     protected implicit def implicitBoxWorld:World = world.apply()
 

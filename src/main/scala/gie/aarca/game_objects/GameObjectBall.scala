@@ -34,6 +34,7 @@ class GameObjectBall(textureHolder: ResourceHolder[Texture], posX: Float, posY: 
         density = 1f
         restitution = 1f
         friction = 0f
+        filter.maskBits = (filter.maskBits & (~CollisionCategories.batDynamic)).toShort
     })
 
 

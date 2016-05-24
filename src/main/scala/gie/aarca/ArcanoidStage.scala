@@ -26,7 +26,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         /*trait order does matter*/
 { asThis =>
 
-    private val camera = new OrthographicCamera()
+    protected val camera = new OrthographicCamera()
     val viewport = new FitViewport(w,h, camera)
 
     protected val batch = manageDisposableResource(new SpriteBatch())
@@ -46,11 +46,12 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         processInput()
 
         implicitly[World].step(delta, 8, 3)
+        bat.updateWorld() //TODO: generalize
         applyAfterWorldCmdQueue()
     }
 
     def onSurfaceChanged(width: Int, height: Int): Unit ={
-        viewport.update(w, h)
+        viewport.update(width, height)
     }
 
     def onPause(): Unit ={}
