@@ -15,16 +15,23 @@ import slogging.{Logger, LoggerHolder, StrictLogging}
 import scala.collection.mutable
 
 
-class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageTrait with StrictLogging { asThis =>
+class ArcanoidStage(val stageController: StageControllerApiTrait)
+    extends StageTrait
+        with StrictLogging
+        with ContactResolverTrait
+        with GameWorldWallsTrait
+{ asThis =>
 
-    private val cmdQueue = new mutable.Queue[()=>Unit]()
-    private def applyCmdQueue(): Unit ={
+    protected val cmdQueue = new mutable.Queue[()=>Unit]()
+    protected def applyCmdQueue(): Unit ={
         cmdQueue.foreach(_.apply())
         cmdQueue.clear()
     }
 
-    private val w = 20  //blocks
-    private val h = (w*1.66f).toInt
+    protected val w = 20  //blocks
+    protected val h = (w*1.66f).toInt
+
+    protected implicit def implicitBoxWorld = world()
 
     private val camera = new OrthographicCamera()
     val viewport = new FitViewport(w,h, camera)
@@ -36,41 +43,15 @@ class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageT
 
     private val boxDebugRenderer = new Box2DDebugRenderer()
 
-    private val world = manageDisposableResource (new World(new Vector2(0, 0), true))
+    protected val world = manageDisposableResource (new World(new Vector2(0, 0), true))
 
-    private object contacter extends ContactResolverTrait with LoggerHolder {
-        val stage = asThis
-        protected def logger: Logger = asThis.logger
-    }
 
     world().setContactListener(contacter)
 
-    private implicit def implicitBoxWorld = world()
-
-    private val bricks = (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).to[mutable.Set]
-    private val ball = new GameObjectBall(ballTex(), 0,0)
+    protected val bricks = (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).to[mutable.Set]
+    protected val ball = new GameObjectBall(ballTex(), 0,0)
 
     buildWorldWalls()
-
-
-
-    private def buildWall(x: Float, y: Float, w: Float, h: Float):GameObjectWall ={
-        new GameObjectWall(x, y, w, h)
-    }
-
-    private def buildWorldWalls(): Unit ={
-        //bottom
-        buildWall(0, -h/2-1, w, 1)
-
-        //top
-        buildWall(0, h/2, w, 1)
-
-        //left
-        buildWall(-w/2-0.5f, 0, 1, h)
-
-        //right
-        buildWall(w/2+0.5f, 0, 1, h)
-    }
 
     def update(delta: Float): Unit = {
 
@@ -122,16 +103,4 @@ class ArcanoidStage(val stageController: StageControllerApiTrait) extends StageT
     def onCreate(): Unit ={}
 
 
-
-    def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
-        logger.debug("HIT")
-
-        cmdQueue += (()=>{
-            val isRemoved=bricks.remove(brick)
-            assert (isRemoved)
-
-            world().destroyBody(brick.body)
-
-        })
-    }
 }
