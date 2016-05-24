@@ -75,7 +75,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
         val deltaInSec = if (wasSuspended){
             logger.debug("was suspended")
             wasSuspended=false
-            0.0f
+            0.01f
         } else {
             Gdx.graphics.getDeltaTime()
         }
