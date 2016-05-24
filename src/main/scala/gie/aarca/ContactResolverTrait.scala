@@ -13,11 +13,14 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
     protected def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
         logger.debug("HIT")
 
-        enqueueAfterWorldCmd{()=>
-            removeRenderable(brick)
-            //implicitly[World].destroyBody(brick.body)
-            brick.destroy()
+        brick.hit()
+        if(brick.hitLimitReached){
+            enqueueAfterWorldCmd{()=>
+                removeRenderable(brick)
+                brick.destroy()
+            }
         }
+
     }
 
 

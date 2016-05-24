@@ -23,6 +23,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         with ContactResolverTrait
         with GameWorldWallsTrait
         with BatTrait
+        with LevelBuilderTrait
         /*trait order does matter*/
 { asThis =>
 
@@ -32,18 +33,23 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
     protected val batch = manageDisposableResource(new SpriteBatch())
 
     val brickTex = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_pink_small.png")))
+    val brickTexBroken = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_pink_small.png")))
+
+    val brickGreenTex = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small.png")))
+    val brickGreenTexBroken = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small_cracked.png")))
 
     private val boxDebugRenderer = new Box2DDebugRenderer()
 
-    (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
+    //(for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
+
+    loadLevel("01.txt").foreach(addRenderable _)
+
     protected val ball = new GameObjectBall(manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png"))), 0,0)
 
         addRenderable(ball)
 
 
     def update(delta: Float): Unit = {
-
-        //processInput()
 
         implicitly[World].step(delta, 8, 3)
         bat.updateWorld() //TODO: generalize

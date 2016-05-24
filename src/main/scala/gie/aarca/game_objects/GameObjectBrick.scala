@@ -9,7 +9,18 @@ import gie.gdx.implicits._
 
 class GameObjectBrick(texture: Texture,posX: Float, posY: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectTrait { go=>
 
-    private val m_sprite = {
+    protected var hitCounter = 0
+
+
+    def hitLimitReached: Boolean = {
+        hitCounter>=1
+    }
+
+    def hit(): Unit ={
+        hitCounter +=1
+    }
+
+    protected val m_sprite = {
         val s = new Sprite(texture)
         s.setSize(2-0.1f,1-0.1f)
         s.setOriginCenter()
@@ -38,5 +49,25 @@ class GameObjectBrick(texture: Texture,posX: Float, posY: Float)(implicit world:
     protected def body: Body = m_body
 
     init()
+
+}
+
+
+class GameObjectBrick2(texture: Texture, texture2: Texture, posX: Float, posY: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectBrick(texture, posX, posY){
+
+    override def hitLimitReached: Boolean = {
+        hitCounter>=2
+    }
+
+    protected val m_sprite2 = {
+        val s = new Sprite(texture2)
+        s.setSize(2-0.1f,1-0.1f)
+        s.setOriginCenter()
+        s.setOPosition(posX, posY)
+        s
+    }
+
+    override def sprite: Sprite = if(hitCounter<=0) m_sprite else m_sprite2
+
 
 }

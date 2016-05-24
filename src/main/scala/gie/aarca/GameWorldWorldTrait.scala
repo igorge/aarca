@@ -21,7 +21,7 @@ object CollisionCategories {
 trait GameWorldWorldTrait { this: ArcanoidStage =>
 
     protected val w:Float = 20  //blocks
-    protected val h = (w*1.66f).toInt
+    protected val h:Float = (w*1.66f).toInt
 
     protected implicit def implicitBoxWorld:World = world.apply()
 
