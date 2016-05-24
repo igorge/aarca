@@ -38,7 +38,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
     (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
     protected val ball = new GameObjectBall(manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png"))), 0,0)
 
-    addRenderable(ball)
+        addRenderable(ball)
 
 
     def update(delta: Float): Unit = {

@@ -23,7 +23,6 @@ trait GameWorldWorldTrait { this: ArcanoidStage =>
     protected val w:Float = 20  //blocks
     protected val h = (w*1.66f).toInt
 
-
     protected implicit def implicitBoxWorld:World = world.apply()
 
     val world = manageDisposableResource (new World(new Vector2(0, 0), true))
