@@ -43,7 +43,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
     def update(delta: Float): Unit = {
 
-        processInput()
+        //processInput()
 
         implicitly[World].step(delta, 8, 3)
         bat.updateWorld() //TODO: generalize
@@ -54,7 +54,9 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         viewport.update(width, height)
     }
 
-    def onPause(): Unit ={}
+    def onPause(): Unit ={
+        Gdx.input.setInputProcessor(null)
+    }
 
     def onSaveState(): Unit ={}
 
@@ -77,7 +79,9 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         boxDebugRenderer.render( world(), camera.combined)
     }
 
-    def onResume(): Unit ={}
+    def onResume(): Unit ={
+        Gdx.input.setInputProcessor(inputProcessor)
+    }
 
     def onDestroy(): Unit ={}
 

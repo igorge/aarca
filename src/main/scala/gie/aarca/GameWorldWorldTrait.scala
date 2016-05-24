@@ -20,7 +20,7 @@ object CollisionCategories {
 
 trait GameWorldWorldTrait { this: ArcanoidStage =>
 
-    protected val w = 20  //blocks
+    protected val w:Float = 20  //blocks
     protected val h = (w*1.66f).toInt
 
 

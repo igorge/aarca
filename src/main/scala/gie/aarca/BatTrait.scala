@@ -1,6 +1,6 @@
 package gie.aarca
 
-import com.badlogic.gdx.{Gdx, Input}
+import com.badlogic.gdx.{Gdx, Input, InputProcessor}
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import gie.gdx.{ResourceContext, manageDisposableResource, manageResource}
@@ -15,26 +15,42 @@ trait BatTrait { this: ArcanoidStage=>
     private val rightVelocity = new Vector2(10,0)
 
 
-    protected def processInput(): Unit ={
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
-            logger.debug("left")
-            bat.body.setLinearVelocity(leftVelocity)
+    protected val inputProcessor = new InputProcessor {
+
+        var touchX:Float = 0
+        var posOnTouchX:Float = 0
+
+        def keyTyped(character: Char): Boolean = false
+
+        def mouseMoved(screenX: Int, screenY: Int): Boolean = false
+
+        def keyDown(keycode: Int): Boolean = false
+
+        def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean ={
+            touchX = unprojectX(screenX)
+            posOnTouchX = bat.x
+            true
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
-            logger.debug("right")
-            bat.body.setLinearVelocity(rightVelocity)
+        def keyUp(keycode: Int): Boolean = false
+
+        def scrolled(amount: Int): Boolean = false
+
+        def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean ={
+            touchX = 0
+            true
         }
 
+        def touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean ={
 
-        if (Gdx.input.isTouched()) {
-            logger.trace("Input occurred at x=" + Gdx.input.getX() + ", y=" + Gdx.input.getY())
-            val pos = camera.unproject( new Vector3(Gdx.input.getX, Gdx.input.getY, 0), viewport.getScreenX, viewport.getScreenY, viewport.getScreenWidth, viewport.getScreenHeight)
+            val delta = touchX - unprojectX(screenX)
 
-            bat.body.setTransform(pos.x, bat.y, 0)
-            //sprite.setOriginPosition(pos.x, pos.y)
+            bat.body.setTransform(posOnTouchX - delta, bat.y, 0)
+
+            true
         }
 
+        private def unprojectX(x:Float) = camera.unproject( new Vector3(x, 0, 0), viewport.getScreenX, viewport.getScreenY, viewport.getScreenWidth, viewport.getScreenHeight).x
     }
 
 
