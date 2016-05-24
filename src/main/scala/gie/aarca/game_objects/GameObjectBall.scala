@@ -22,7 +22,7 @@ class GameObjectBall(textureHolder: ResourceHolder[Texture], posX: Float, posY: 
     private val m_body = world.createBody(new BodyDef {
         `type` = BodyType.DynamicBody
         position.set(go.x, go.y)
-        linearVelocity.set(20f, 20f)
+        linearVelocity.set(15f, 15f)
         linearDamping = 0f
     })
 

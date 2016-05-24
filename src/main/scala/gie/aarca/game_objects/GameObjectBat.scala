@@ -69,7 +69,7 @@ class GameObjectBat(textureHolder: ResourceHolder[Texture], posX: Float, posY: F
     })
 
 
-    override def destroy(): Unit ={
+    override def doDestroy(): Unit ={
         val w = world
         w.destroyBody(m_bodyStatic)
         w.destroyBody(m_bodyDynamic)

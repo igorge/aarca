@@ -22,7 +22,9 @@ trait RenderableQueueTrait { this: ArcanoidStage=>
 
     protected def removeRenderable(o: RenderableTrait): Unit ={
         val isRemoved = renderableObjects.remove(o)
-        assert(isRemoved)
+        if(!isRemoved){
+            logger.warn(s"Renderable ${o} was already destroyed, double free!")
+        }
     }
 
     protected def renderRenderable(lb:SpriteBatch): Unit ={

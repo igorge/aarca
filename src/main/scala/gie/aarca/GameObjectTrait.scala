@@ -6,6 +6,8 @@ import gie.gdx.implicits._
 
 
 trait GameObjectTrait extends RenderableTrait {
+    private var isDestroyed = false
+
     def sprite: Sprite
     protected def body: Body
     def world: World = body.getWorld
@@ -36,7 +38,13 @@ trait GameObjectTrait extends RenderableTrait {
         sprite.draw(batch)
     }
 
-    def destroy(): Unit ={
+    protected def doDestroy(): Unit ={
         world.destroyBody(body)
+    }
+
+    final def destroy(): Unit ={
+        if(!isDestroyed){
+            doDestroy()
+        }
     }
 }

@@ -23,6 +23,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 {
 
 
+    private val hack_SimDelta = 1f /30
     private var wasSuspended:Boolean = true
 
     lazy val stageController = new StageWrapper(new StageController())
@@ -69,6 +70,8 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
     }
 
 
+    private var drift:Float = 0
+
     def render(): Unit ={
         //logger.trace(s"Game.render()")
 
@@ -80,8 +83,23 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             Gdx.graphics.getDeltaTime()
         }
 
-        stageController.update(deltaInSec)
-        stageController.render(deltaInSec)
+        drift -= deltaInSec - hack_SimDelta
+
+//        if (drift>hack_SimDelta){
+//            drift -= hack_SimDelta
+//        } else {
+//            stageController.update(hack_SimDelta)
+//            drift += hack_SimDelta
+//            if (drift<hack_SimDelta){
+//                stageController.update(hack_SimDelta)
+//            }
+//        }
+
+        stageController.update(hack_SimDelta)
+
+        //logger.debug(s"DRIFT: ${drift}")
+
+        stageController.render(hack_SimDelta)
 
 
         val vp = stageController.viewport
