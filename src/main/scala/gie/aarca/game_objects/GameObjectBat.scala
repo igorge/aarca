@@ -9,24 +9,23 @@ import gie.gdx.implicits._
 
 
 
-class GameObjectBall(textureHolder: ResourceHolder[Texture], posX: Float, posY: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectTrait { go =>
+class GameObjectBat(textureHolder: ResourceHolder[Texture], posX: Float, posY: Float)(implicit world: World, resourceContext: ResourceContext) extends GameObjectTrait { go =>
     def texture = textureHolder()
     private val m_sprite = {
         val s = new Sprite(texture)
-        s.setSize(1f,1f)
+        s.setSize(3f,0.5f)
         s.setOriginCenter()
         s.setOPosition(posX, posY)
         s
     }
 
     private val m_body = world.createBody(new BodyDef {
-        `type` = BodyType.DynamicBody
+        `type` = BodyType.KinematicBody
         position.set(go.x, go.y)
-        linearVelocity.set(10f, 10f)
     })
 
-    private val goShape = manageResource(new CircleShape(){
-        setRadius(go.width/2)
+    private val goShape = manageResource(new PolygonShape(){
+        setAsBox(go.width/2, go.height/2)
     })
 
     private val fixture0 = m_body.createFixture( new FixtureDef{

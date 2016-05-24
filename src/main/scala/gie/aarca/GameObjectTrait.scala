@@ -1,11 +1,11 @@
 package gie.aarca
 
-import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.graphics.g2d.{Sprite, SpriteBatch}
 import com.badlogic.gdx.physics.box2d._
 import gie.gdx.implicits._
 
 
-trait GameObjectTrait {
+trait GameObjectTrait extends RenderableTrait {
     def sprite: Sprite
     def body: Body
 
@@ -30,4 +30,8 @@ trait GameObjectTrait {
         body.setUserData(this)
     }
 
+    // update before render
+    def render(batch: SpriteBatch): Unit ={
+        sprite.draw(batch)
+    }
 }

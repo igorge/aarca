@@ -18,53 +18,35 @@ import scala.collection.mutable
 class ArcanoidStage(val stageController: StageControllerApiTrait)
     extends StageTrait
         with StrictLogging
+        with RenderableQueueTrait
+        with GameWorldWorldTrait
         with ContactResolverTrait
         with GameWorldWallsTrait
+        with BatTrait
+        /*trait order does matter*/
 { asThis =>
-
-    protected val cmdQueue = new mutable.Queue[()=>Unit]()
-    protected def applyCmdQueue(): Unit ={
-        cmdQueue.foreach(_.apply())
-        cmdQueue.clear()
-    }
-
-    protected val w = 20  //blocks
-    protected val h = (w*1.66f).toInt
-
-    protected implicit def implicitBoxWorld = world()
 
     private val camera = new OrthographicCamera()
     val viewport = new FitViewport(w,h, camera)
-    private val batch = manageDisposableResource(new SpriteBatch())
+
+    protected val batch = manageDisposableResource(new SpriteBatch())
 
     val brickTex = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_pink_small.png")))
-    val ballTex = manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png")))
-
 
     private val boxDebugRenderer = new Box2DDebugRenderer()
 
-    protected val world = manageDisposableResource (new World(new Vector2(0, 0), true))
+    (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
+    protected val ball = new GameObjectBall(manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png"))), 0,0)
 
+    addRenderable(ball)
 
-    world().setContactListener(contacter)
-
-    protected val bricks = (for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).to[mutable.Set]
-    protected val ball = new GameObjectBall(ballTex(), 0,0)
-
-    buildWorldWalls()
 
     def update(delta: Float): Unit = {
 
+        processInput()
 
-        world().step(delta, 8, 3)
-
-        applyCmdQueue()
-
-        bricks.foreach{go=>
-            go.update()
-        }
-
-        ball.update()
+        implicitly[World].step(delta, 8, 3)
+        applyAfterWorldCmdQueue()
     }
 
     def onSurfaceChanged(width: Int, height: Int): Unit ={
@@ -82,11 +64,9 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         Gdx.gl.glClearColor(1, 1, 1, 1)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-
         lb.setProjectionMatrix(camera.combined)
         lb.begin()
-        bricks.foreach(_.sprite.draw(lb))
-        ball.sprite.draw(lb)
+        renderRenderable(lb)
         lb.end()
     }
 

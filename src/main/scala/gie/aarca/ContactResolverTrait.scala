@@ -1,6 +1,6 @@
 package gie.aarca
 
-import com.badlogic.gdx.physics.box2d.{Contact, ContactImpulse, ContactListener, Manifold}
+import com.badlogic.gdx.physics.box2d._
 import slogging.{Logger, LoggerHolder}
 
 import scala.annotation.tailrec
@@ -8,17 +8,15 @@ import scala.annotation.tailrec
 
 trait ContactResolverTrait { asThis: ArcanoidStage =>
 
+    implicitly[World].setContactListener(contacter)
 
-    def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
+    protected def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
         logger.debug("HIT")
 
-        asThis.cmdQueue += (()=>{
-            val isRemoved=bricks.remove(brick)
-            assert (isRemoved)
-
-            world().destroyBody(brick.body)
-
-        })
+        enqueueAfterWorldCmd{()=>
+            removeRenderable(brick)
+            implicitly[World].destroyBody(brick.body)
+        }
     }
 
 

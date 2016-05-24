@@ -28,6 +28,7 @@ abstract class DisposableOnceAbstract[T >: Null <: AnyRef](var resource:T) exten
 class ResourceHolder[T >: Null <: AnyRef](private val m_resource:DisposableOnceAbstract[T]) extends Disposable {
     @inline private[gdx] def disposableOnce = m_resource
     @inline def apply():T = m_resource()
+    @inline def get = this.apply()
 
     override def toString = s"ResourceHolder(${m_resource.toString}) aka ${super.toString}"
 
