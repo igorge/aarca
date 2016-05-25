@@ -10,8 +10,9 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
 
     implicitly[World].setContactListener(contacter)
 
-    protected def handleCollision(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
-        logger.debug("HIT")
+    protected def handleCollisionBegin(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
+
+        sndKick01().play()
 
         brick.hit()
         if(brick.hitLimitReached){
@@ -20,6 +21,18 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
                 brick.destroy()
             }
         }
+
+    }
+
+    protected def handleCollisionBegin(ball: GameObjectBall, brick: GameObjectWall): Unit ={
+        sndKick02().play()
+    }
+
+    protected def handleCollisionBegin(ball: GameObjectBall, brick: GameObjectBat): Unit ={
+        sndKick02().play()
+    }
+
+    protected def handleCollisionEnd(ball: GameObjectBall, brick: GameObjectBrick): Unit ={
 
     }
 
@@ -53,15 +66,15 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
             (a, b) match {
 
                 case (brick: GameObjectBrick, ball: GameObjectBall) =>
-                    stage.handleCollision(ball, brick)
+                    stage.handleCollisionEnd(ball, brick)
                 case (ball: GameObjectBall, brick: GameObjectBrick) =>
-                    stage.handleCollision(ball, brick)
+                    stage.handleCollisionEnd(ball, brick)
 
                 case (_: GameObjectWall, _: GameObjectBall) =>
                 case (_: GameObjectBall, _: GameObjectWall) =>
 
                 case _ =>
-                    logger.debug(s"unknown type contact end: ${a}  <=>  ${b}")
+//                    logger.debug(s"unknown type contact end: ${a}  <=>  ${b}")
             }
 
             // logger.debug(s"contact end: ${a}  <=>  ${b}")
@@ -71,7 +84,26 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
             val a = contact.getFixtureA.getBody.getUserData()
             val b = contact.getFixtureB.getBody.getUserData()
 
-            //logger.debug(s"contact begin: ${a}  <=>  ${b}")
+            (a, b) match {
+
+                case (brick: GameObjectBrick, ball: GameObjectBall) =>
+                    stage.handleCollisionBegin(ball, brick)
+                case (ball: GameObjectBall, brick: GameObjectBrick) =>
+                    stage.handleCollisionBegin(ball, brick)
+
+                case (wall: GameObjectWall, ball: GameObjectBall) =>
+                    stage.handleCollisionBegin(ball, wall)
+                case (ball: GameObjectBall, wall: GameObjectWall) =>
+                    stage.handleCollisionBegin(ball, wall)
+
+                case (bat: GameObjectBat, ball: GameObjectBall) =>
+                    stage.handleCollisionBegin(ball, bat)
+                case (ball: GameObjectBall, bat: GameObjectBat) =>
+                    stage.handleCollisionBegin(ball, bat)
+
+                case _ =>
+                    logger.debug(s"unknown type contact end: ${a}  <=>  ${b}")
+            }
         }
     }
 

@@ -38,6 +38,11 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
     val brickGreenTex = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small.png")))
     val brickGreenTexBroken = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small_cracked.png")))
 
+    val sndKick01 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick.ogg")))
+    val sndKick02 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick2.ogg")))
+
+
+
     private val boxDebugRenderer = new Box2DDebugRenderer()
 
     //(for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
