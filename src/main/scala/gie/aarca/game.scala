@@ -23,7 +23,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 {
 
 
-    private val hack_SimDelta = 1f /30
+    private val hack_SimDelta = 1f /60
     private var wasSuspended:Boolean = true
 
     lazy val stageController = new StageWrapper(new StageController())
@@ -83,23 +83,42 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
             Gdx.graphics.getDeltaTime()
         }
 
-        drift -= deltaInSec - hack_SimDelta
+        //hack, thats because box2d requires constant world update deltas
+        drift += deltaInSec - hack_SimDelta
+        if(drift<0){
+            // need to slow down sim
+            val deltaAbs = Math.abs(drift)
+            if(deltaAbs / hack_SimDelta <= 1 ) {
+                stageController.update(hack_SimDelta)
+            } else {
+                logger.debug(s"skipping sim, sim delta: ${hack_SimDelta}, delta abs: ${deltaAbs}")
+                drift += hack_SimDelta
+            }
+        } else {
+            // need to speed up sim
+            val deltaAbs = Math.abs(drift)
 
-//        if (drift>hack_SimDelta){
-//            drift -= hack_SimDelta
-//        } else {
-//            stageController.update(hack_SimDelta)
-//            drift += hack_SimDelta
-//            if (drift<hack_SimDelta){
-//                stageController.update(hack_SimDelta)
-//            }
-//        }
+            if(deltaAbs / hack_SimDelta <= 1 ) {
+                stageController.update(hack_SimDelta)
+            } else {
+                val simCount = (deltaAbs / hack_SimDelta).toInt
+                logger.debug(s"multi sim, extra count: ${simCount}, sim delta: ${hack_SimDelta}, delta abs: ${deltaAbs}")
 
-        stageController.update(hack_SimDelta)
+                stageController.update(hack_SimDelta)
+
+                var i = 0
+                while(i<simCount) {
+                    stageController.update(hack_SimDelta)
+                    i+=1
+                    drift -= hack_SimDelta
+                }
+            }
+        }
+
 
         //logger.debug(s"DRIFT: ${drift}")
 
-        stageController.render(hack_SimDelta)
+        stageController.render(deltaInSec)
 
 
         val vp = stageController.viewport
