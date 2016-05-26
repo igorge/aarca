@@ -11,7 +11,9 @@ class StageController()(implicit implicitParentResourceContext: ResourceContext)
     override def onCreate(): Unit ={
         super.onCreate()
 
-        enqueue_pushStage(new StageWrapper(new ArcanoidStage(this)))
+        enqueue_pushStage{ controller=>
+            new StageWrapper(new ArcanoidStage(controller))
+        }
 
     }
 

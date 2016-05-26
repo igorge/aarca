@@ -24,13 +24,13 @@ abstract class StageController
 
     private var m_currentStage: StageTrait = NullStage
 
-    protected def enqueue_replaceStage(stage: StageTrait): Unit ={
+    def enqueue_replaceStage(stage: (StageControllerApiTrait) => StageTrait): Unit ={
         logger.debug(s"StageController.enqueue_ReplaceStage(${stage})")
 
         m_cmdQueue += (()=>{
             impl_destroyStage(m_currentStage)
-            m_currentStage = stage
-            impl_createAndResumeStage(stage)
+            m_currentStage = new StageWrapper(stage(this))
+            impl_createAndResumeStage(m_currentStage)
         })
     }
 
@@ -44,14 +44,14 @@ abstract class StageController
         })
     }
 
-    protected def enqueue_pushStage(stage: StageTrait): Unit ={
+    protected def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit ={
         logger.debug(s"StageController.enqueue_pushStage(${stage})")
 
         m_cmdQueue += (()=>{
             m_currentStage.onPause()
             m_stageStack.push(m_currentStage)
-            m_currentStage = stage
-            impl_createAndResumeStage(stage)
+            m_currentStage = stage(this)
+            impl_createAndResumeStage(m_currentStage )
         })
     }
 

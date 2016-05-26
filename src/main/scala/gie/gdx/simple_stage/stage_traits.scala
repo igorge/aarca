@@ -9,10 +9,10 @@ trait StageControllerApiTrait extends ResourceContextResolver {
 
     implicit def implicitResourceContext: ResourceContext
 
-    protected def enqueue_pushStage(stage: StageTrait): Unit
+    protected def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit
     protected def enqueue_popStage(): Unit
 
-    protected def enqueue_replaceStage(stage: StageTrait): Unit
+    def enqueue_replaceStage(stage: (StageControllerApiTrait) => StageTrait): Unit
 
 }
 

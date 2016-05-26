@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import gie.gdx.{ResourceContext, manageDisposableResource, manageResource}
-import gie.gdx.stage.{StageControllerApiTrait, StageTrait}
+import gie.gdx.stage.{StageControllerApiTrait, StageTrait, StageWrapper}
 import gie.gdx.implicits._
 import slogging.{Logger, LoggerHolder, StrictLogging}
 
@@ -24,6 +24,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
         with GameWorldWallsTrait
         with BatTrait
         with LevelBuilderTrait
+        with BackgroundTrait
         /*trait order does matter*/
 { asThis =>
 
@@ -38,10 +39,8 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
     val brickGreenTex = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small.png")))
     val brickGreenTexBroken = manageDisposableResource (new Texture(Gdx.files.internal("data/bricks/brick_green_small_cracked.png")))
 
-    val sndKick01 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick.ogg")))
+    val sndKick01 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick2.ogg")))
     val sndKick02 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick2.ogg")))
-
-
 
     private val boxDebugRenderer = new Box2DDebugRenderer()
 
@@ -51,7 +50,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
     protected val ball = new GameObjectBall(manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png"))), 0,0)
 
-        addRenderable(ball)
+    addRenderable(ball)
 
 
     def update(delta: Float): Unit = {
@@ -71,7 +70,16 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
     def onSaveState(): Unit ={}
 
+    var debug_timer = 0f
+
     def render(delta: Float): Unit ={
+
+        debug_timer += delta
+
+        if( debug_timer>30f){
+            stageController.enqueue_replaceStage( new ArcanoidStage(_) )
+        }
+
 
         val lb = batch()
 
@@ -80,6 +88,7 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
         lb.setProjectionMatrix(camera.combined)
         lb.begin()
+        renderBackground(lb)
         renderRenderable(lb)
         lb.end()
     }
