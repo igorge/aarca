@@ -34,7 +34,7 @@ abstract class StageController
         })
     }
 
-    protected def enqueue_popStage(): Unit ={
+    def enqueue_popStage(): Unit ={
         logger.debug(s"StageController.enqueue_popStage()")
 
         m_cmdQueue += (()=>{
@@ -44,7 +44,7 @@ abstract class StageController
         })
     }
 
-    protected def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit ={
+    def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit ={
         logger.debug(s"StageController.enqueue_pushStage(${stage})")
 
         m_cmdQueue += (()=>{

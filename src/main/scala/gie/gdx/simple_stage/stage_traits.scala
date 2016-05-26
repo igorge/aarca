@@ -9,10 +9,12 @@ trait StageControllerApiTrait extends ResourceContextResolver {
 
     implicit def implicitResourceContext: ResourceContext
 
-    protected def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit
-    protected def enqueue_popStage(): Unit
+    def enqueue_pushStage(stage: (StageControllerApiTrait) => StageTrait): Unit
+    def enqueue_popStage(): Unit
 
     def enqueue_replaceStage(stage: (StageControllerApiTrait) => StageTrait): Unit
+
+    def renderDebug: Boolean
 
 }
 
@@ -43,7 +45,7 @@ trait StageTrait extends ResourceContextResolver {
 
 class StageWrapper(stage: StageTrait) extends StageTrait with StrictLogging {
     def stageController: StageControllerApiTrait = {
-        logger.debug(s"StageWrapper(${stage}).stageController")
+        //logger.debug(s"StageWrapper(${stage}).stageController")
         stage.stageController
     }
 

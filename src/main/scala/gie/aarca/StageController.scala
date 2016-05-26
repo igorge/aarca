@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import gie.gdx.ResourceContext
 import gie.gdx.stage.{StageControllerApiTrait, StageTrait, StageWrapper, StageController => GdxStageController}
 
-class StageController()(implicit implicitParentResourceContext: ResourceContext) extends GdxStageController{
+abstract class StageController()(implicit implicitParentResourceContext: ResourceContext) extends GdxStageController{
 
     override implicit def implicitResourceContext: ResourceContext = implicitParentResourceContext
 
@@ -12,7 +12,7 @@ class StageController()(implicit implicitParentResourceContext: ResourceContext)
         super.onCreate()
 
         enqueue_pushStage{ controller=>
-            new StageWrapper(new ArcanoidStage(controller))
+            new StageWrapper(new ArcanoidStage(1, controller))
         }
 
     }

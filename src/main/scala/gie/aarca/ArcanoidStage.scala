@@ -15,13 +15,14 @@ import slogging.{Logger, LoggerHolder, StrictLogging}
 import scala.collection.mutable
 
 
-class ArcanoidStage(val stageController: StageControllerApiTrait)
+class ArcanoidStage(val currentLevel: Int, val stageController: StageControllerApiTrait)
     extends StageTrait
         with StrictLogging
         with RenderableQueueTrait
         with GameWorldWorldTrait
         with ContactResolverTrait
         with GameWorldWallsTrait
+        with LooserTrait
         with BatTrait
         with LevelBuilderTrait
         with BackgroundTrait
@@ -42,11 +43,15 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
     val sndKick01 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick2.ogg")))
     val sndKick02 = manageDisposableResource (Gdx.audio.newSound(Gdx.files.internal("sound/kick2.ogg")))
 
-    private val boxDebugRenderer = new Box2DDebugRenderer()
+    private lazy val boxDebugRenderer = manageDisposableResource( new Box2DDebugRenderer() )
 
     //(for(i<-(-9 to 9 by 2)) yield new GameObjectBrick(brickTex(), i, h/2 -1)).foreach(addRenderable _)
 
-    loadLevel("01.txt").foreach(addRenderable _)
+    protected var aliveBricks = 0
+    loadLevel(f"${currentLevel}%02d.txt").foreach{ brick=>
+        addRenderable(brick)
+        aliveBricks +=1
+    }
 
     protected val ball = new GameObjectBall(manageDisposableResource (new Texture(Gdx.files.internal("data/ball_orange.png"))), 0,0)
 
@@ -54,6 +59,12 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
 
     def update(delta: Float): Unit = {
+
+        if(aliveBricks==0){
+            stageController.enqueue_replaceStage{ stageController =>
+                new ArcanoidStage(currentLevel+1, stageController)
+            }
+        }
 
         implicitly[World].step(delta, 8, 3)
         bat.updateWorld() //TODO: generalize
@@ -70,15 +81,15 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
     def onSaveState(): Unit ={}
 
-    var debug_timer = 0f
+//    var debug_timer = 0f
 
     def render(delta: Float): Unit ={
 
-        debug_timer += delta
-
-        if( debug_timer>30f){
-            stageController.enqueue_replaceStage( new ArcanoidStage(_) )
-        }
+//        debug_timer += delta
+//
+//        if( debug_timer>30f){
+//            stageController.enqueue_replaceStage( new ArcanoidStage(_) )
+//        }
 
 
         val lb = batch()
@@ -96,14 +107,16 @@ class ArcanoidStage(val stageController: StageControllerApiTrait)
 
     def renderDebugInfo(): Unit ={
         Gdx.gl.glLineWidth(5)
-        boxDebugRenderer.render( world(), camera.combined)
+        boxDebugRenderer().render( world(), camera.combined)
     }
 
     def onResume(): Unit ={
         Gdx.input.setInputProcessor(inputProcessor)
     }
 
-    def onDestroy(): Unit ={}
+    def onDestroy(): Unit ={
+        implicitly[World].setContactListener(null)  // for preventing native object ('world') holding this and stopping GC
+    }
 
     def onCreate(): Unit ={}
 

@@ -26,7 +26,9 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
     private val hack_SimDelta = 1f /60
     private var wasSuspended:Boolean = true
 
-    lazy val stageController = new StageWrapper(new StageController())
+    lazy val stageController = new StageWrapper(new StageController(){
+        def renderDebug: Boolean = false
+    })
 
     stageController.implicitResourceContext
 
@@ -122,7 +124,7 @@ class Game()(implicit executor: ExecutionContext) extends ApplicationListener
 
 
         val vp = stageController.viewport
-        if(vp ne null) {
+        if((vp ne null) && stageController.stageController.renderDebug) {
 
             stageController.renderDebugInfo()
 

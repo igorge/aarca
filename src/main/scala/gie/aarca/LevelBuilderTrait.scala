@@ -1,6 +1,9 @@
 package gie.aarca
 
+import java.io.FileNotFoundException
+
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.GdxRuntimeException
 
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
@@ -10,9 +13,18 @@ trait LevelBuilderTrait { this: ArcanoidStage=>
 
 
     protected def loadLevel(fileName: String): Seq[GameObjectBrick] ={
-        val levelFile = Gdx.files.internal(s"levels/${fileName}")
+        val levelFileName = s"levels/${fileName}"
 
-        val lines = Source.fromInputStream(levelFile.read()).getLines().toArray
+        val lines = (try{
+            val levelFile = Gdx.files.internal(levelFileName)
+            Source.fromInputStream(levelFile.read())
+        } catch {
+            case e:GdxRuntimeException if e.getCause.isInstanceOf[FileNotFoundException] =>
+                logger.debug(s"Level file not found: '${levelFileName}', trying to load default.")
+                val levelFile = Gdx.files.internal(s"levels/default.txt")
+                Source.fromInputStream(levelFile.read())
+        }).getLines().toArray
+
 
         var bricks = new ArrayBuffer[GameObjectBrick]()
 

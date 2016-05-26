@@ -17,6 +17,7 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
         brick.hit()
         if(brick.hitLimitReached){
             enqueueAfterWorldCmd{()=>
+                aliveBricks-=1
                 removeRenderable(brick)
                 brick.destroy()
             }
@@ -96,10 +97,16 @@ trait ContactResolverTrait { asThis: ArcanoidStage =>
                 case (ball: GameObjectBall, wall: GameObjectWall) =>
                     stage.handleCollisionBegin(ball, wall)
 
+                case (_: GameObjectLooserDetector, _: GameObjectBall) =>
+                    stage.impl_gameOver()
+                case (_: GameObjectBall, _: GameObjectLooserDetector) =>
+                    stage.impl_gameOver()
+
                 case (bat: GameObjectBat, ball: GameObjectBall) =>
                     stage.handleCollisionBegin(ball, bat)
                 case (ball: GameObjectBall, bat: GameObjectBat) =>
                     stage.handleCollisionBegin(ball, bat)
+
 
                 case _ =>
                     logger.debug(s"unknown type contact end: ${a}  <=>  ${b}")
