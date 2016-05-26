@@ -6,11 +6,11 @@ trait LooserTrait { this: ArcanoidStage =>
 
         logger.info("GAME OVER!")
 
-//        stageController.enqueue_replaceStage{ stageController =>
-//            new ArcanoidStage(1, stageController)
-//        }
+        stageController.enqueue_replaceStage{ stageController =>
+            new ArcanoidStage(1, stageController)
+        }
 
-        stageController.enqueue_popStage()
+      //  stageController.enqueue_popStage()
 
     }
 

@@ -44,8 +44,8 @@ trait GameWorldWallsTrait { this:ArcanoidStage=>
 
     protected def buildWorldWalls(): Unit ={
         //bottom
-        buildWall(0, -h/2-1, w, 1) // for debug
-        //new GameObjectLooserDetector(0, -h/2-1, w, 1)
+        //buildWall(0, -h/2-1, w, 1) // for debug
+        new GameObjectLooserDetector(0, -h/2-1, w, 1)
 
         //top
         buildWall(0, h/2+1, w, 1)
