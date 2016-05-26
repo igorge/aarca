@@ -1,5 +1,5 @@
 aarca
 =====
 
-Arcanoid like game for android (scala+libgdx+box2d)
+Arkanoid like game for android (scala+libgdx+box2d)
 
